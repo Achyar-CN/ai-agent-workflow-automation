@@ -1,164 +1,112 @@
 # AI Sales Lead Researcher
 
-A multi-agent system that turns a single company name into a qualified lead and a
-ready-to-send, personalized cold email — in seconds. Built to demonstrate that an
-AI pipeline can absorb the hours of manual research an SDR does per account.
+A multi-agent system that turns a single company name into a qualified lead and a ready to send cold email. It runs the research an SDR would otherwise do by hand, then decides whether the lead is worth pursuing before it writes anything.
 
-> **One input → four agents → a decision and a draft.**
-> Type `Acme Corp`, watch the pipeline research it, find the decision-makers, score
-> it against your Ideal Customer Profile, and (if it qualifies) write the email.
-
----
+![Python](https://img.shields.io/badge/Python-3.11-3776AB) ![LangGraph](https://img.shields.io/badge/LangGraph-multi--agent-1C7C54) ![FastAPI](https://img.shields.io/badge/FastAPI-stream-009688) ![Next.js 16](https://img.shields.io/badge/Next.js-16-black)
 
 ## What it does
 
-Given a **company name** and your **Ideal Customer Profile (ICP)**, a LangGraph
-pipeline runs four specialized agents and streams their progress live:
+Give it a company name and your Ideal Customer Profile. A LangGraph pipeline runs four agents and streams their progress to the dashboard as each one finishes.
 
-| # | Agent | Output |
-|---|-------|--------|
-| 1 | **Research** | Company profile (industry, size, location, products, recent signals) from public web sources |
-| 2 | **Enrich** | Key decision-makers from **public pages only** — each with its source URL |
-| 3 | **Qualify** | A 0–100 fit score vs. your ICP, with matched criteria, gaps, and a **GO / NO-GO** verdict |
-| 4 | **Draft** | A personalized cold email — *only when the lead qualifies* |
+| Agent | Output |
+| --- | --- |
+| Research | Company profile with industry, size, location, products, and recent signals from public web sources |
+| Enrich | Decision makers taken from public pages only, each kept with its source URL |
+| Qualify | A fit score from 0 to 100 against your ICP, with matched criteria, gaps, and a GO or NO GO verdict |
+| Draft | A personalized cold email, written only when the lead qualifies |
 
-The decision after step 3 is the point of the project: an unqualified lead
-**short-circuits** and never reaches the drafting agent. That's real SDR triage,
-not a linear script.
+The verdict after the qualify step is the point of the project. A lead that does not qualify stops there and never reaches the drafting agent. That is real triage, not a linear script.
 
-```
-START → research → enrich → qualify ─┬─ (GO)──→ draft → END
-                                     └─ (NO-GO)──────────→ END
-```
+## Pipeline
 
----
-
-## Why it's built this way
-
-- **Hybrid stack on purpose.** The agent orchestration is **Python + LangGraph**
-  (the credible, recognizable way to build multi-agent systems); the dashboard is
-  **Next.js 16 + TypeScript**, sharing the design language of my
-  [`local-ai-chatbot`](https://github.com) project.
-- **Provider-pluggable.** One adapter, two backends: runs fully **offline on Ollama**
-  (free, private) or on a frontier **Claude** model for the best output — switch with a
-  single env var, no code changes.
-- **Ethical by design — no LinkedIn scraping.** Scraping LinkedIn violates its ToS, is
-  brittle, and gets accounts banned. This project uses **keyless public web search** plus a
-  **curated seed dataset** for a reproducible demo. People are extracted only from public
-  pages and always carry a source URL. *This limitation is a feature: it shows judgement,
-  not a shortcut.*
-
----
+![Agent pipeline](docs/pipeline.svg)
 
 ## Architecture
 
+![System architecture](docs/architecture.svg)
+
+The browser talks to the Next.js dashboard. A route handler proxies the request to FastAPI, which runs the LangGraph state graph and relays each agent event as Server-Sent Events. The dashboard reads one origin, so there is no CORS to manage. Every agent returns a Pydantic validated object, and the same schema is mirrored in TypeScript, so the UI always receives well formed data. See [docs/architecture.md](docs/architecture.md) for the full data flow.
+
+## Why it is built this way
+
+- The orchestration is Python and LangGraph, the recognizable way to build a multi-agent system. The dashboard is Next.js and TypeScript, sharing the design language of my [local-ai-chatbot](https://github.com/Achyar-CN) project.
+- One provider adapter, two backends. It runs fully offline on Ollama, or on a Claude model for the best output. Switching is a single environment variable with no code change.
+- No LinkedIn scraping. That violates LinkedIn terms of service, is brittle, and gets accounts banned. People come from public pages and a curated seed dataset instead, and each one carries a source URL. The constraint is deliberate and shows judgement rather than a shortcut.
+
+## Requirements
+
+- Python 3.11 or newer and Node.js 20 or newer.
+- For the default offline mode, [Ollama](https://ollama.com) running locally with a model pulled:
+
+```bash
+ollama pull llama3.2:3b
 ```
-┌─────────────────────────┐         SSE          ┌──────────────────────────────┐
-│  Next.js 16 dashboard   │  ◀───────────────────│  FastAPI  (/research stream)  │
-│  (streaming UI, ICP form)│   stage events       │                              │
-└─────────────────────────┘                       │   LangGraph StateGraph        │
-        │ proxy /api/research                      │   research→enrich→qualify→draft│
-        ▼                                          │   + provider adapter          │
-   one origin, no CORS                             │     Ollama  |  Claude          │
-                                                   └──────────────────────────────┘
-```
 
-- **Streaming:** each agent emits `start` / `done` / `skipped` events via LangGraph's
-  custom stream writer; FastAPI relays them as Server-Sent Events; the Next.js route
-  proxies the stream so the browser only ever talks to one origin.
-- **Structured output:** every agent returns a **Pydantic-validated** object (Ollama
-  JSON-schema mode / Claude forced tool call), so the UI always receives well-formed data.
+## Quick start
 
-See [`docs/architecture.md`](docs/architecture.md) for the full data flow.
+Backend:
 
----
-
-## Quickstart
-
-### Prerequisites
-- **Python 3.11+** and **Node.js 20+**
-- For the default (offline) mode: **[Ollama](https://ollama.com)** running locally with a model pulled:
-  ```bash
-  ollama pull llama3.2:3b        # fast, CPU-friendly default
-  # ollama pull qwen2.5:7b-instruct   # optional, higher quality
-  ```
-
-### 1. Backend (agents)
 ```bash
 cd backend
 python -m venv .venv
-.venv/Scripts/activate          # Windows  (source .venv/bin/activate on macOS/Linux)
+.venv/Scripts/activate
 pip install -e ".[dev]"
-cp .env.example .env            # adjust if needed
-uvicorn app.main:app --reload   # → http://127.0.0.1:8000
+cp .env.example .env
+uvicorn app.main:app --reload
 ```
 
-### 2. Frontend (dashboard)
+Frontend:
+
 ```bash
 cd frontend
 npm install
-npm run dev                     # → http://localhost:3000
+npm run dev
 ```
 
-Open **http://localhost:3000**, click **“Fill demo”**, pick **Acme Corp**, and hit
-**Run agents**.
+Open http://localhost:3000, click Fill demo, pick Acme Corp, and run the agents. On macOS or Linux use `source .venv/bin/activate` in the backend step.
 
----
+## Configuration
 
-## Switching LLM provider
-
-Everything is driven by `backend/.env`:
+The backend reads `backend/.env`.
 
 ```ini
 # Offline, free, private (default)
 LLM_PROVIDER=ollama
 OLLAMA_MODEL=llama3.2:3b
 
-# Frontier quality (needs an API key)
+# Frontier quality, needs an API key
 LLM_PROVIDER=claude
 ANTHROPIC_API_KEY=sk-ant-...
-CLAUDE_MODEL=claude-opus-4-8     # or claude-sonnet-4-6 for cheaper/faster
+CLAUDE_MODEL=claude-opus-4-8
 ```
 
-The agents call one interface (`app/llm/provider.py`); nothing else changes.
-
----
+The agents call one interface in `app/llm/provider.py`. Nothing else changes between providers.
 
 ## Testing
 
 ```bash
 cd backend
-pytest                 # 22 tests: schemas, provider parsing, each agent node,
-                       # and GO vs NO-GO graph routing — all without network or a live model
+pytest
 ```
 
-Deterministic logic (schema validation, web-search parsing, threshold routing) is unit
-tested; LLM-dependent steps are tested by **contract** (the output validates) rather than
-exact text, using the seed fixtures.
-
----
+The suite covers schema validation, provider output parsing, each agent node, and the GO versus NO GO routing. It runs without a network or a live model. Deterministic logic is unit tested, and LLM steps are tested by contract, meaning the output validates against the schema rather than matching exact text, using the seed fixtures.
 
 ## Tech stack
 
-**Backend:** Python 3.11 · LangGraph · FastAPI · Pydantic v2 · httpx · trafilatura ·
-Anthropic SDK · Ollama
-**Frontend:** Next.js 16 · React 19 · TypeScript (strict) · Tailwind CSS 4 · CVA · lucide-react
+Backend: Python 3.11, LangGraph, FastAPI, Pydantic v2, httpx, trafilatura, Anthropic SDK, Ollama.
 
----
+Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS 4, lucide-react.
 
-## Project layout
+## Project structure
 
 ```
-backend/    FastAPI + LangGraph multi-agent pipeline  (see backend/app/graph)
+backend/    FastAPI and LangGraph multi-agent pipeline (see backend/app/graph)
 frontend/   Next.js 16 streaming dashboard
-docs/       Architecture & data-ethics notes
+docs/        Architecture notes and diagrams
 ```
 
-## Limitations & honesty
+## Notes
 
-- Live web extraction is best-effort; for unknown companies the quality depends on what's
-  publicly indexed. The **seed set** (`Acme Corp`, `Globex Industries`) guarantees a clean
-  demo, including offline.
-- No email is *sent* — the system drafts; a human reviews and sends. That's intentional.
-- `email_guess` is left empty unless an address literally appears on a public page; the
-  system never fabricates contact details.
+- Live extraction is best effort. For an unknown company the quality depends on what is publicly indexed. The seed set, Acme Corp and Globex Industries, keeps the demo clean and works offline.
+- No email is ever sent. The system drafts, and a person reviews and sends.
+- An email address is left empty unless it literally appears on a public page. The system never fabricates contact details.

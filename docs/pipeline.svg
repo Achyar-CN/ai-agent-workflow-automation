@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" font-family="Inter, 'Segoe UI', system-ui, sans-serif">
+  <defs>
+    <marker id="ar--head" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto">
+      <path d="M0 0 L7 3 L0 6 Z" fill="#C9A14A" />
+    </marker>
+    <style>
+      .title { fill:#F3EEE3; font-size:30px; font-weight:700; letter-spacing:-0.5px; }
+      .sub   { fill:#9C927C; font-size:14px; }
+      .box   { fill:#211d14; stroke:#3a3326; stroke-width:1.2; }
+      .pill  { fill:#262115; stroke:#46402e; stroke-width:1; }
+      .chip  { fill:rgba(232,179,57,0.09); stroke:rgba(232,179,57,0.34); stroke-width:1; }
+      .num   { fill:#E8B339; font-size:12px; font-weight:700; letter-spacing:1px;
+               font-family:ui-monospace,'Cascadia Code',Menlo,monospace; text-anchor:middle; }
+      .name  { fill:#F3EEE3; font-size:18px; font-weight:600; text-anchor:middle; }
+      .desc  { fill:#8A8169; font-size:11.5px; text-anchor:middle; }
+      .out   { fill:#C9BFA8; font-size:12px; text-anchor:middle; }
+      .end   { fill:#C9BFA8; font-size:14px; font-weight:600; text-anchor:middle; }
+      .flow  { stroke:#C9A14A; stroke-width:1.7; fill:none; }
+      .dash  { stroke:#C9A14A; stroke-width:1.5; fill:none; stroke-dasharray:5 5; opacity:0.85; }
+      .tag   { fill:#E8B339; font-size:11px; font-weight:600; letter-spacing:0.5px;
+               font-family:ui-monospace,'Cascadia Code',Menlo,monospace; }
+      .tagno { fill:#9C927C; font-size:11px; font-weight:600; letter-spacing:0.5px;
+               font-family:ui-monospace,'Cascadia Code',Menlo,monospace; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="470" fill="#17150F" />
+
+  <text x="40" y="50" class="title">Agent Pipeline</text>
+  <text x="40" y="74" class="sub">One company name moves through four agents and a qualify decision.</text>
+
+  <!-- input -->
+  <rect x="28" y="170" width="150" height="92" rx="12" class="box" />
+  <text x="103" y="206" class="name" style="font-size:15px">Input</text>
+  <text x="103" y="228" class="desc">company name</text>
+  <text x="103" y="244" class="desc">plus ICP</text>
+
+  <path class="flow" d="M178 216 L208 216" marker-end="url(#ar--head)" />
+
+  <!-- 01 research -->
+  <rect x="208" y="150" width="206" height="132" rx="13" class="box" />
+  <rect x="226" y="166" width="34" height="22" rx="7" class="chip" />
+  <text x="243" y="181" class="num">01</text>
+  <text x="311" y="214" class="name">Research</text>
+  <text x="311" y="236" class="desc">public web plus seed data</text>
+  <text x="311" y="262" class="out">Company profile</text>
+
+  <path class="flow" d="M414 216 L444 216" marker-end="url(#ar--head)" />
+
+  <!-- 02 enrich -->
+  <rect x="444" y="150" width="206" height="132" rx="13" class="box" />
+  <rect x="462" y="166" width="34" height="22" rx="7" class="chip" />
+  <text x="479" y="181" class="num">02</text>
+  <text x="547" y="214" class="name">Enrich</text>
+  <text x="547" y="236" class="desc">public pages only</text>
+  <text x="547" y="262" class="out">Key people with sources</text>
+
+  <path class="flow" d="M650 216 L680 216" marker-end="url(#ar--head)" />
+
+  <!-- 03 qualify -->
+  <rect x="680" y="150" width="206" height="132" rx="13" class="box" />
+  <rect x="698" y="166" width="34" height="22" rx="7" class="chip" />
+  <text x="715" y="181" class="num">03</text>
+  <text x="783" y="214" class="name">Qualify</text>
+  <text x="783" y="236" class="desc">score against ICP, 0 to 100</text>
+  <text x="783" y="262" class="out">GO or NO GO verdict</text>
+
+  <!-- GO branch to draft -->
+  <path class="flow" d="M886 216 L944 216" marker-end="url(#ar--head)" />
+  <text x="915" y="206" class="tag" text-anchor="middle">GO</text>
+
+  <!-- 04 draft -->
+  <rect x="944" y="150" width="206" height="132" rx="13" class="box" />
+  <rect x="962" y="166" width="34" height="22" rx="7" class="chip" />
+  <text x="979" y="181" class="num">04</text>
+  <text x="1047" y="214" class="name">Draft</text>
+  <text x="1047" y="236" class="desc">runs only on GO</text>
+  <text x="1047" y="262" class="out">Personalized email</text>
+
+  <!-- NO GO branch skips draft -->
+  <path class="dash" d="M783 282 L783 392 L944 392" marker-end="url(#ar--head)" />
+  <text x="793" y="335" class="tagno" text-anchor="start">NO GO, skip draft</text>
+
+  <!-- draft down to done -->
+  <path class="flow" d="M1047 282 L1047 392" marker-end="url(#ar--head)" />
+
+  <!-- done -->
+  <rect x="944" y="392" width="206" height="48" rx="12" class="chip" />
+  <text x="1047" y="421" class="end" style="fill:#E8B339">Result delivered</text>
+</svg>

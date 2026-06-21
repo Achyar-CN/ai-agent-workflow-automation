@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" font-family="Inter, 'Segoe UI', system-ui, sans-serif">
+  <defs>
+    <marker id="ar--head" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto">
+      <path d="M0 0 L7 3 L0 6 Z" fill="#C9A14A" />
+    </marker>
+    <style>
+      .title { fill:#F3EEE3; font-size:30px; font-weight:700; letter-spacing:-0.5px; }
+      .sub   { fill:#9C927C; font-size:14px; }
+      .grp   { fill:#1b1810; stroke:#3a3326; stroke-width:1.2; }
+      .box   { fill:#211d14; stroke:#3a3326; stroke-width:1.2; }
+      .pill  { fill:#262115; stroke:#46402e; stroke-width:1; }
+      .chip  { fill:rgba(232,179,57,0.09); stroke:rgba(232,179,57,0.34); stroke-width:1; }
+      .h     { fill:#E8B339; font-size:12px; font-weight:600; letter-spacing:1.5px;
+               font-family:ui-monospace,'Cascadia Code',Menlo,monospace; }
+      .name  { fill:#F3EEE3; font-size:16px; font-weight:600; text-anchor:middle; }
+      .nm    { fill:#F3EEE3; font-size:13px; font-weight:600; text-anchor:middle; }
+      .small { fill:#C9BFA8; font-size:12px; text-anchor:middle; }
+      .tiny  { fill:#8A8169; font-size:10.5px; text-anchor:middle;
+               font-family:ui-monospace,'Cascadia Code',Menlo,monospace; }
+      .flow  { stroke:#C9A14A; stroke-width:1.6; fill:none; }
+      .lbl   { fill:#9C927C; font-size:11px;
+               font-family:ui-monospace,'Cascadia Code',Menlo,monospace; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="640" fill="#17150F" />
+
+  <text x="40" y="50" class="title">System Architecture</text>
+  <text x="40" y="74" class="sub">Next.js dashboard, FastAPI stream, and a LangGraph multi-agent backend.</text>
+
+  <!-- Frontend -->
+  <rect x="80" y="120" width="420" height="150" rx="14" class="grp" />
+  <text x="106" y="150" class="h">FRONTEND</text>
+  <rect x="104" y="166" width="372" height="44" rx="9" class="box" />
+  <text x="290" y="194" class="name">Next.js 16 dashboard</text>
+  <rect x="104" y="216" width="180" height="40" rx="9" class="pill" />
+  <text x="194" y="241" class="nm">ICP form</text>
+  <rect x="296" y="216" width="180" height="40" rx="9" class="pill" />
+  <text x="386" y="241" class="nm">live progress UI</text>
+
+  <!-- proxy note -->
+  <rect x="104" y="300" width="372" height="40" rx="9" class="chip" />
+  <text x="290" y="325" class="nm" style="fill:#E8B339">/api/research proxy, one origin, no CORS</text>
+
+  <path class="flow" d="M290 270 L290 298" marker-end="url(#ar--head)" />
+
+  <!-- SSE link to backend -->
+  <path class="flow" d="M500 320 L700 320" marker-end="url(#ar--head)" />
+  <text x="600" y="310" class="lbl" text-anchor="middle">Server-Sent Events</text>
+
+  <!-- Backend -->
+  <rect x="700" y="120" width="420" height="320" rx="14" class="grp" />
+  <text x="726" y="150" class="h">BACKEND, PYTHON</text>
+
+  <rect x="724" y="166" width="372" height="44" rx="9" class="box" />
+  <text x="910" y="194" class="name">FastAPI, /research stream</text>
+
+  <path class="flow" d="M910 210 L910 234" marker-end="url(#ar--head)" />
+
+  <rect x="724" y="234" width="372" height="120" rx="11" class="box" />
+  <text x="746" y="260" class="h" style="font-size:11px">LANGGRAPH STATEGRAPH</text>
+  <rect x="742" y="276" width="78" height="62" rx="8" class="pill" />
+  <text x="781" y="304" class="tiny" style="fill:#F3EEE3;font-size:12px">Research</text>
+  <rect x="828" y="276" width="78" height="62" rx="8" class="pill" />
+  <text x="867" y="304" class="tiny" style="fill:#F3EEE3;font-size:12px">Enrich</text>
+  <rect x="914" y="276" width="78" height="62" rx="8" class="pill" />
+  <text x="953" y="304" class="tiny" style="fill:#F3EEE3;font-size:12px">Qualify</text>
+  <rect x="1000" y="276" width="78" height="62" rx="8" class="pill" />
+  <text x="1039" y="304" class="tiny" style="fill:#F3EEE3;font-size:12px">Draft</text>
+  <path class="flow" d="M820 307 L826 307" marker-end="url(#ar--head)" />
+  <path class="flow" d="M906 307 L912 307" marker-end="url(#ar--head)" />
+  <path class="flow" d="M992 307 L998 307" marker-end="url(#ar--head)" />
+
+  <path class="flow" d="M910 354 L910 378" marker-end="url(#ar--head)" />
+
+  <!-- provider adapter -->
+  <rect x="724" y="378" width="372" height="46" rx="9" class="box" />
+  <text x="828" y="406" class="nm">Provider adapter</text>
+  <rect x="932" y="386" width="74" height="30" rx="8" class="chip" />
+  <text x="969" y="406" class="nm" style="fill:#E8B339">Ollama</text>
+  <rect x="1014" y="386" width="74" height="30" rx="8" class="chip" />
+  <text x="1051" y="406" class="nm" style="fill:#E8B339">Claude</text>
+
+  <!-- structured output note -->
+  <rect x="80" y="486" width="1040" height="86" rx="14" class="grp" />
+  <text x="106" y="516" class="h">CONTRACT</text>
+  <text x="106" y="544" class="small" text-anchor="start">Every agent returns a Pydantic validated object. The same schema is mirrored in TypeScript,</text>
+  <text x="106" y="562" class="small" text-anchor="start">so the dashboard always receives well formed data over the stream.</text>
+</svg>
