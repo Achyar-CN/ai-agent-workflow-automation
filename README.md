@@ -1,5 +1,6 @@
 # AI Sales Lead Researcher
 
+
 A multi-agent system that turns a single company name into a qualified lead and a ready to send cold email. It runs the research an SDR would otherwise do by hand, then decides whether the lead is worth pursuing before it writes anything.
 
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB) ![LangGraph](https://img.shields.io/badge/LangGraph-multi--agent-1C7C54) ![FastAPI](https://img.shields.io/badge/FastAPI-stream-009688) ![Next.js 16](https://img.shields.io/badge/Next.js-16-black)
